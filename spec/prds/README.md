@@ -4,3 +4,6 @@ This directory contains the foundational Product Requirements Documents that des
 
 ## Foundational PRDs
 * [Backend Foundations](./backend-foundations-prd.md)
+
+## Related
+* [Specifications (Specs)](../specs/README.md) - Derived implementation contracts.
