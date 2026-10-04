@@ -1,6 +1,6 @@
 # Spec 01: Developer Tooling (Makefile)
 
-**Status:** `draft`
+**Status:** `complete`
 **Derived From:** [Backend Foundations PRD](../prds/backend-foundations-prd.md)
 
 ## Objective

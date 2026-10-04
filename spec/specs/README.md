@@ -10,7 +10,7 @@ This directory contains the detailed technical specifications and Test-Driven De
 
 ## Index of Specifications
 
-*   [01. Developer Tooling (Makefile)](./01-developer-tooling-spec.md) - `draft`
+*   [01. Developer Tooling (Makefile)](./01-developer-tooling-spec.md) - `complete`
 *   [02. Configuration Loader](./02-config-loader-spec.md) - `draft`
 *   [03. Database & Storage Layer](./03-database-layer-spec.md) - `draft`
 *   [04. Axum Web Service](./04-axum-service-spec.md) - `draft`
