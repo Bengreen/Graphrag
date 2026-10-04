@@ -27,7 +27,7 @@ migrate:
 
 # Runs all unit and integration tests
 test:
-	cargo test
+	cargo test -- --test-threads=1
 	@if [ -f integration-tests/run-tests-local.sh ]; then \
 		echo "Running integration tests script..."; \
 		./integration-tests/run-tests-local.sh; \
