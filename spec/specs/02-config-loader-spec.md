@@ -1,6 +1,6 @@
 # Spec 02: Configuration Loader
 
-**Status:** `draft`
+**Status:** `complete`
 **Derived From:** [Backend Foundations PRD](../prds/backend-foundations-prd.md)
 
 ## Objective
@@ -11,7 +11,7 @@ Implement a fail-fast, centralized configuration loading mechanism that hydrates
 ### 1. Centralized Struct (`AppConfig`)
 - The application configuration must be modeled using a single, centralized struct, typically named `AppConfig`.
 - Configuration should be loaded using a robust crate (e.g., `config` or `figment`).
-- Sources must include YAML configuration files and environment variable overrides (e.g., prefixed with `AAD_BE__`).
+- Sources must include YAML configuration files and environment variable overrides (e.g., prefixed with `GRAPHRAG_BE__`).
 
 ### 2. Fail-Fast Validation
 - `AppConfig` must implement a `.validate()` method (or equivalent initialization check).
