@@ -8,6 +8,7 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct AppConfig {
     pub database: DatabaseConfig,
+    pub server_host: String,
     pub server_port: u16,
 }
 
@@ -60,7 +61,8 @@ mod tests {
         let mut file = NamedTempFile::new().unwrap();
         writeln!(
             file,
-            "database:\n  url: postgres://yaml\n  pool_size: 10\n  timeout_seconds: 30\nserver_port: 8081"
+            "database:\n  url: postgres://yaml\n  pool_size: 10\n  timeout_seconds: 30\nserver_host: 127.0.0.1
+server_port: 8081"
         )
         .unwrap();
 
@@ -80,7 +82,8 @@ mod tests {
         let mut file = NamedTempFile::new().unwrap();
         writeln!(
             file,
-            "database:\n  url: postgres://yaml\n  pool_size: 10\n  timeout_seconds: 30\nserver_port: 8081"
+            "database:\n  url: postgres://yaml\n  pool_size: 10\n  timeout_seconds: 30\nserver_host: 127.0.0.1
+server_port: 8081"
         )
         .unwrap();
 
@@ -111,6 +114,7 @@ mod tests {
                 pool_size: 10,
                 timeout_seconds: 30,
             },
+            server_host: "127.0.0.1".to_string(),
             server_port: 8080,
         };
         assert!(config.validate().is_err());
@@ -124,6 +128,7 @@ mod tests {
                 pool_size: 10,
                 timeout_seconds: 30,
             },
+            server_host: "127.0.0.1".to_string(),
             server_port: 0,
         };
         assert!(config.validate().is_err());
@@ -137,6 +142,7 @@ mod tests {
                 pool_size: 0,
                 timeout_seconds: 30,
             },
+            server_host: "127.0.0.1".to_string(),
             server_port: 8080,
         };
         assert!(config.validate().is_err());
@@ -150,6 +156,7 @@ mod tests {
                 pool_size: 10,
                 timeout_seconds: 0,
             },
+            server_host: "127.0.0.1".to_string(),
             server_port: 8080,
         };
         assert!(config.validate().is_err());

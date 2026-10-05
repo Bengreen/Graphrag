@@ -1,6 +1,6 @@
 # Spec 04: Axum Web Service
 
-**Status:** `draft`
+**Status:** `complete`
 **Derived From:** [Backend Foundations PRD](../prds/backend-foundations-prd.md)
 
 ## Objective
