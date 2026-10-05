@@ -13,6 +13,6 @@ This directory contains the detailed technical specifications and Test-Driven De
 *   [01. Developer Tooling (Makefile)](./01-developer-tooling-spec.md) - `complete`
 *   [02. Configuration Loader](./02-config-loader-spec.md) - `complete`
 *   [03. Database & Storage Layer](./03-database-layer-spec.md) - `draft`
-*   [04. Axum Web Service](./04-axum-service-spec.md) - `draft`
+*   [04. Axum Web Service](./04-axum-service-spec.md) - `complete`
 *   [05. Health Monitoring Sidecar (HaMS)](./05-hams-sidecar-spec.md) - `draft`
 *   [06. LLM Tools Integration](./06-llm-tools-spec.md) - `draft`
