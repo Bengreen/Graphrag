@@ -1,12 +1,14 @@
 mod cli;
 mod config;
+mod db;
 
 use clap::Parser;
 use cli::Cli;
 use config::AppConfig;
 use std::process;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let cli = Cli::parse();
 
     let config = match AppConfig::load(cli.config.as_deref()) {
@@ -22,5 +24,19 @@ fn main() {
         process::exit(1);
     }
 
-    println!("Configuration loaded successfully: {:?}", config);
+    println!("Configuration loaded successfully.");
+
+    let _pool = match db::init_db(&config.database).await {
+        Ok(p) => {
+            println!("Database connection pool initialized and verified successfully.");
+            p
+        }
+        Err(e) => {
+            eprintln!("Database initialization failed: {}", e);
+            process::exit(1);
+        }
+    };
+
+    // Application logic will follow here in future specs
+    println!("Application started successfully.");
 }
