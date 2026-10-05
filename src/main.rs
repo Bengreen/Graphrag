@@ -3,6 +3,7 @@ mod config;
 mod db;
 mod routes;
 mod state;
+pub mod hams_tools;
 
 use clap::Parser;
 use cli::Cli;
@@ -10,33 +11,54 @@ use config::AppConfig;
 use state::AppState;
 use std::process;
 use std::sync::Arc;
+use tokio_util::sync::CancellationToken;
+use hams::hams::Hams;
+use crate::hams_tools::HamsHarness;
+use tracing::{info, error};
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt::init();
+
     let cli = Cli::parse();
+    let ct = CancellationToken::new();
 
     let config = match AppConfig::load(cli.config.as_deref()) {
         Ok(c) => c,
         Err(e) => {
-            eprintln!("Failed to load configuration: {}", e);
+            error!("Failed to load configuration: {}", e);
             process::exit(1);
         }
     };
 
     if let Err(e) = config.validate() {
-        eprintln!("Configuration validation failed: {}", e);
+        error!("Configuration validation failed: {}", e);
         process::exit(1);
     }
 
-    println!("Configuration loaded successfully.");
+    info!("Configuration loaded successfully.");
+
+    let hams_config = config.hams.clone();
+    let hams = Hams::new(hams_config);
+    let mut hams_harness = match HamsHarness::init(hams, ct.clone()).await {
+        Ok(h) => {
+            info!("HaMS sidecar initialized successfully");
+            h
+        }
+        Err(e) => {
+            error!("Failed to initialize HaMS: {}", e);
+            process::exit(1);
+        }
+    };
 
     let pool = match db::init_db(&config.database).await {
         Ok(p) => {
-            println!("Database connection pool initialized and verified successfully.");
+            info!("Database connection pool initialized and verified successfully.");
+            hams_harness.ready_signal.enable();
             p
         }
         Err(e) => {
-            eprintln!("Database initialization failed: {}", e);
+            error!("Database initialization failed: {}", e);
             process::exit(1);
         }
     };
@@ -55,15 +77,24 @@ async fn main() {
     let listener = match tokio::net::TcpListener::bind(&address).await {
         Ok(l) => l,
         Err(e) => {
-            eprintln!("Failed to bind to address {}: {}", address, e);
+            error!("Failed to bind to address {}: {}", address, e);
             process::exit(1);
         }
     };
 
-    println!("Application started successfully. Listening on {}", address);
+    info!("Application started successfully. Listening on {}", address);
 
-    if let Err(e) = axum::serve(listener, app).await {
-        eprintln!("Server error: {}", e);
+    let server = axum::serve(listener, app).with_graceful_shutdown(async move {
+        ct.cancelled().await;
+        info!("Graceful shutdown signal received, stopping axum server");
+    });
+
+    if let Err(e) = server.await {
+        error!("Server error: {}", e);
         process::exit(1);
+    }
+
+    if let Err(e) = hams_harness.hams.stop() {
+        error!("Failed to cleanly stop HaMS: {}", e);
     }
 }
