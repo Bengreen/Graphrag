@@ -3,18 +3,45 @@ use figment::{
     Figment,
     providers::{Env, Format, Yaml},
 };
-use serde::Deserialize;
 use hams::hams::config::HamsConfig;
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize, PartialEq, Clone)]
+pub struct LlmConfig {
+    pub provider: String,
+    pub base_url: String,
+    pub api_key: Option<String>,
+    pub model: String,
+    pub timeout_seconds: u64,
+}
+
+impl LlmConfig {
+    pub fn validate(&self) -> Result<(), String> {
+        if self.provider.trim().is_empty() {
+            return Err("llm.provider must not be empty".to_string());
+        }
+        if self.base_url.trim().is_empty() {
+            return Err("llm.base_url must not be empty".to_string());
+        }
+        if self.model.trim().is_empty() {
+            return Err("llm.model must not be empty".to_string());
+        }
+        if self.timeout_seconds == 0 {
+            return Err("llm.timeout_seconds must be greater than 0".to_string());
+        }
+        Ok(())
+    }
+}
 
 #[derive(Debug, Deserialize)]
 pub struct AppConfig {
     pub database: DatabaseConfig,
     pub server_host: String,
     pub server_port: u16,
-    #[serde(serialize_with = "serialize_hams", default)]
+    #[serde(default)]
     pub hams: HamsConfig,
+    pub llm: LlmConfig,
 }
-
 
 impl AppConfig {
     #[allow(clippy::result_large_err)]
@@ -32,6 +59,7 @@ impl AppConfig {
 
     pub fn validate(&self) -> Result<(), String> {
         self.database.validate()?;
+        self.llm.validate()?;
 
         if self.server_port == 0 {
             return Err("server_port must be a valid port number".to_string());
@@ -43,10 +71,10 @@ impl AppConfig {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use hams::hams::config::HamsConfig;
     use std::env;
     use std::io::Write;
     use std::sync::Mutex;
-    use hams::hams::config::HamsConfig;
     use tempfile::NamedTempFile;
 
     static ENV_MUTEX: Mutex<()> = Mutex::new(());
@@ -67,8 +95,7 @@ mod tests {
         let mut file = NamedTempFile::new().unwrap();
         writeln!(
             file,
-            "database:\n  url: postgres://yaml\n  pool_size: 10\n  timeout_seconds: 30\nserver_host: 127.0.0.1
-server_port: 8081"
+            "database:\n  url: postgres://yaml\n  pool_size: 10\n  timeout_seconds: 30\nserver_host: 127.0.0.1\nserver_port: 8081\nllm:\n  provider: ollama\n  base_url: http://localhost:11434/v1\n  model: llama3\n  timeout_seconds: 60"
         )
         .unwrap();
 
@@ -88,8 +115,7 @@ server_port: 8081"
         let mut file = NamedTempFile::new().unwrap();
         writeln!(
             file,
-            "database:\n  url: postgres://yaml\n  pool_size: 10\n  timeout_seconds: 30\nserver_host: 127.0.0.1
-server_port: 8081"
+            "database:\n  url: postgres://yaml\n  pool_size: 10\n  timeout_seconds: 30\nserver_host: 127.0.0.1\nserver_port: 8081\nllm:\n  provider: ollama\n  base_url: http://localhost:11434/v1\n  model: llama3\n  timeout_seconds: 60"
         )
         .unwrap();
 
@@ -123,7 +149,14 @@ server_port: 8081"
             server_host: "127.0.0.1".to_string(),
             server_port: 8080,
             hams: HamsConfig::default(),
-};
+            llm: LlmConfig {
+                provider: "ollama".to_string(),
+                base_url: "http://localhost:11434/v1".to_string(),
+                api_key: None,
+                model: "llama3".to_string(),
+                timeout_seconds: 60,
+            },
+        };
         assert!(config.validate().is_err());
     }
 
@@ -138,6 +171,13 @@ server_port: 8081"
             server_host: "127.0.0.1".to_string(),
             server_port: 0,
             hams: HamsConfig::default(),
+            llm: LlmConfig {
+                provider: "ollama".to_string(),
+                base_url: "http://localhost:11434/v1".to_string(),
+                api_key: None,
+                model: "llama3".to_string(),
+                timeout_seconds: 60,
+            },
         };
         assert!(config.validate().is_err());
     }
@@ -153,7 +193,14 @@ server_port: 8081"
             server_host: "127.0.0.1".to_string(),
             server_port: 8080,
             hams: HamsConfig::default(),
-};
+            llm: LlmConfig {
+                provider: "ollama".to_string(),
+                base_url: "http://localhost:11434/v1".to_string(),
+                api_key: None,
+                model: "llama3".to_string(),
+                timeout_seconds: 60,
+            },
+        };
         assert!(config.validate().is_err());
     }
 
@@ -168,7 +215,14 @@ server_port: 8081"
             server_host: "127.0.0.1".to_string(),
             server_port: 8080,
             hams: HamsConfig::default(),
-};
+            llm: LlmConfig {
+                provider: "ollama".to_string(),
+                base_url: "http://localhost:11434/v1".to_string(),
+                api_key: None,
+                model: "llama3".to_string(),
+                timeout_seconds: 60,
+            },
+        };
         assert!(config.validate().is_err());
     }
 }

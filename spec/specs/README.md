@@ -15,4 +15,4 @@ This directory contains the detailed technical specifications and Test-Driven De
 *   [03. Database & Storage Layer](./03-database-layer-spec.md) - `draft`
 *   [04. Axum Web Service](./04-axum-service-spec.md) - `complete`
 *   [05. Health Monitoring Sidecar (HaMS)](./05-hams-sidecar-spec.md) - `draft`
-*   [06. LLM Tools Integration](./06-llm-tools-spec.md) - `draft`
+*   [06. LLM Tools Integration](./06-llm-tools-spec.md) - `complete`
