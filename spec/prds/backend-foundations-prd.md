@@ -67,9 +67,10 @@ flowchart TD
 
 ### 4. Health Monitoring Sidecar (HaMS)
 **Objective:** Decouple application health reporting and metric telemetry from the primary business logic webservice.
-- **Sidecar Process:** The backend runs a separate sidecar listener (HaMS) typically on a dedicated port (e.g., `8079`).
-- **Telemetry & Probes:** HaMS provides endpoints for Kubernetes-style liveness/readiness probes and exposes Prometheus metrics scraped from the application state.
-- **Lifecycle Integration:** The sidecar starts immediately after configuration validation but before DB connections are made, allowing it to signal application startup issues early.
+- **Sidecar Process:** The backend utilizes the external `hams` crate to run a separate sidecar listener (typically on a dedicated port like `8079`), configured via a nested `hams` block in the YAML config.
+- **Telemetry & Probes:** HaMS provides out-of-the-box endpoints for Kubernetes-style liveness and readiness probes, and exposes Prometheus metrics.
+- **Lifecycle Integration:** The sidecar starts immediately after configuration validation but before DB connections are made. Once the database connection is verified, the system marks the HaMS ready signal to true.
+- **Graceful Shutdown:** The system integrates a `CancellationToken` that HaMS triggers on shutdown. The primary Axum server listens for this token cancellation to perform a graceful HTTP server shutdown.
 
 ### 5. LLM Tools Integration
 **Objective:** Provide internal abstractions for connecting to, prompting, and orchestrating Large Language Models.

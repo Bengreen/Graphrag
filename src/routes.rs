@@ -36,6 +36,7 @@ mod tests {
             },
             server_host: "127.0.0.1".to_string(),
             server_port: 8080,
+            hams: hams::hams::config::HamsConfig::default(),
         });
 
         let state = AppState { pool, config };

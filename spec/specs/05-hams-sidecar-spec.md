@@ -1,6 +1,6 @@
 # Spec 05: Health Monitoring Sidecar (HaMS)
 
-**Status:** `draft`
+**Status:** `complete`
 **Derived From:** [Backend Foundations PRD](../prds/backend-foundations-prd.md)
 
 ## Objective
@@ -8,16 +8,20 @@ Implement a separate sidecar process (HaMS) embedded within the backend to serve
 
 ## Requirements
 
-### 1. Dedicated Listener
-- The HaMS sidecar must run as an independent asynchronous task (e.g., spawned via `tokio::spawn`).
-- It must bind to a completely separate port (e.g., `8079`) configured via `AppConfig`.
+### 1. Dedicated Listener & Crate Integration
+- The HaMS sidecar must utilize the external `hams` crate.
+- Configuration is provided through a nested `hams: HamsConfig` block within `AppConfig`.
+- It binds to a separate port managed by the crate's internal configuration.
 
 ### 2. Probes and Metrics
-- **Liveness & Readiness:** It must expose `/health/live` and `/health/ready` endpoints suitable for Kubernetes probing.
-- **Metrics Exposure:** It must expose a `/metrics` endpoint to serve Prometheus metrics scraped from the application state.
+- **Liveness & Readiness:** The `hams` crate automatically exposes `/health/live` and `/health/ready` endpoints. A custom `Manual` ready signal (`db-connected`) must be initialized and toggled to `true` upon successful database connection pool verification.
+- **Metrics Exposure:** The crate automatically handles Prometheus metric exposure.
 
-### 3. Lifecycle Interlock
-- The HaMS sidecar must be instantiated immediately *after* the configuration is loaded and validated, but *before* database connections or the main Axum listener are established. This ensures startup errors can be observed.
+### 3. Lifecycle Interlock & Graceful Shutdown
+- The HaMS sidecar must be instantiated immediately *after* the configuration is loaded and validated, but *before* database connections or the main Axum listener are established.
+- A `tokio_util::sync::CancellationToken` must be instantiated.
+- The HaMS instance must register a shutdown closure that calls `cancel()` on the token.
+- The main Axum server must utilize `.with_graceful_shutdown(ct.cancelled())` to ensure clean termination.
 
 ## Testing Strategy
 - **Integration Tests:**

@@ -4,13 +4,17 @@ use figment::{
     providers::{Env, Format, Yaml},
 };
 use serde::Deserialize;
+use hams::hams::config::HamsConfig;
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize)]
 pub struct AppConfig {
     pub database: DatabaseConfig,
     pub server_host: String,
     pub server_port: u16,
+    #[serde(serialize_with = "serialize_hams", default)]
+    pub hams: HamsConfig,
 }
+
 
 impl AppConfig {
     #[allow(clippy::result_large_err)]
@@ -42,6 +46,7 @@ mod tests {
     use std::env;
     use std::io::Write;
     use std::sync::Mutex;
+    use hams::hams::config::HamsConfig;
     use tempfile::NamedTempFile;
 
     static ENV_MUTEX: Mutex<()> = Mutex::new(());
@@ -52,6 +57,7 @@ mod tests {
             env::remove_var("GRAPHRAG_BE__DATABASE__POOL_SIZE");
             env::remove_var("GRAPHRAG_BE__DATABASE__TIMEOUT_SECONDS");
             env::remove_var("GRAPHRAG_BE__SERVER_PORT");
+            env::remove_var("GRAPHRAG_BE__HAMS__PORT");
         }
     }
 
@@ -116,7 +122,8 @@ server_port: 8081"
             },
             server_host: "127.0.0.1".to_string(),
             server_port: 8080,
-        };
+            hams: HamsConfig::default(),
+};
         assert!(config.validate().is_err());
     }
 
@@ -130,6 +137,7 @@ server_port: 8081"
             },
             server_host: "127.0.0.1".to_string(),
             server_port: 0,
+            hams: HamsConfig::default(),
         };
         assert!(config.validate().is_err());
     }
@@ -144,7 +152,8 @@ server_port: 8081"
             },
             server_host: "127.0.0.1".to_string(),
             server_port: 8080,
-        };
+            hams: HamsConfig::default(),
+};
         assert!(config.validate().is_err());
     }
 
@@ -158,7 +167,8 @@ server_port: 8081"
             },
             server_host: "127.0.0.1".to_string(),
             server_port: 8080,
-        };
+            hams: HamsConfig::default(),
+};
         assert!(config.validate().is_err());
     }
 }
