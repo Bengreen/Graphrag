@@ -37,9 +37,20 @@ mod tests {
             server_host: "127.0.0.1".to_string(),
             server_port: 8080,
             hams: hams::hams::config::HamsConfig::default(),
+            llm: crate::config::LlmConfig {
+                provider: "ollama".to_string(),
+                base_url: "http://localhost:11434/v1".to_string(),
+                api_key: None,
+                model: "llama3".to_string(),
+                timeout_seconds: 60,
+            },
         });
 
-        let state = AppState { pool, config };
+        let state = AppState {
+            pool,
+            config: config.clone(),
+            llm: std::sync::Arc::new(crate::llm_tools::LlmClient::new(&config.llm).unwrap()),
+        };
 
         let app = create_router().with_state(state);
 

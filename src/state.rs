@@ -1,4 +1,5 @@
 use crate::config::AppConfig;
+use crate::llm_tools::LlmClient;
 use sqlx::PgPool;
 use std::sync::Arc;
 
@@ -6,6 +7,7 @@ use std::sync::Arc;
 pub struct AppState {
     pub pool: PgPool,
     pub config: Arc<AppConfig>,
+    pub llm: Arc<LlmClient>,
 }
 
 impl axum::extract::FromRef<AppState> for PgPool {
@@ -17,5 +19,11 @@ impl axum::extract::FromRef<AppState> for PgPool {
 impl axum::extract::FromRef<AppState> for Arc<AppConfig> {
     fn from_ref(state: &AppState) -> Self {
         state.config.clone()
+    }
+}
+
+impl axum::extract::FromRef<AppState> for Arc<LlmClient> {
+    fn from_ref(state: &AppState) -> Self {
+        state.llm.clone()
     }
 }

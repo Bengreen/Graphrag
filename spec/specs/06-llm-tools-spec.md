@@ -1,6 +1,6 @@
 # Spec 06: LLM Tools Integration
 
-**Status:** `draft`
+**Status:** `complete`
 **Derived From:** [Backend Foundations PRD](../prds/backend-foundations-prd.md)
 
 ## Objective

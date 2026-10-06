@@ -1,20 +1,21 @@
 mod cli;
 mod config;
 mod db;
+pub mod hams_tools;
+mod llm_tools;
 mod routes;
 mod state;
-pub mod hams_tools;
 
+use crate::hams_tools::HamsHarness;
 use clap::Parser;
 use cli::Cli;
 use config::AppConfig;
+use hams::hams::Hams;
 use state::AppState;
 use std::process;
 use std::sync::Arc;
 use tokio_util::sync::CancellationToken;
-use hams::hams::Hams;
-use crate::hams_tools::HamsHarness;
-use tracing::{info, error};
+use tracing::{error, info};
 
 #[tokio::main]
 async fn main() {
@@ -66,9 +67,11 @@ async fn main() {
     let host = config.server_host.clone();
     let port = config.server_port;
 
+    let llm_client = crate::llm_tools::LlmClient::new(&config.llm).unwrap();
     let app_state = AppState {
         pool,
         config: Arc::new(config),
+        llm: Arc::new(llm_client),
     };
 
     let app = routes::create_router().with_state(app_state);
