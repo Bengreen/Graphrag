@@ -16,3 +16,7 @@ This directory contains the detailed technical specifications and Test-Driven De
 *   [04. Axum Web Service](./04-axum-service-spec.md) - `complete`
 *   [05. Health Monitoring Sidecar (HaMS)](./05-hams-sidecar-spec.md) - `draft`
 *   [06. LLM Tools Integration](./06-llm-tools-spec.md) - `complete`
+*   [07. Graph RAG - Ingestion & LLM Extraction](./07-graph-rag-ingestion-extraction-spec.md) - `draft`
+*   [08. Graph RAG - Storage & Graph Construction](./08-graph-rag-storage-spec.md) - `draft`
+*   [09. Graph RAG - Hierarchical Summarization](./09-graph-rag-hierarchical-spec.md) - `draft`
+*   [10. Graph RAG - Baseline Evaluation & Benchmarking](./10-graph-rag-evaluation-spec.md) - `draft`
